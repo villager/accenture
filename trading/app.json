@@ -1,11 +1,12 @@
 {
   "expo": {
-    "name": "portfolio",
-    "slug": "portfolio",
+    "name": "trading",
+    "slug": "trading",
+    "sdkVersion": "57.0.0",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "portfolio",
+    "scheme": "trading",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon"
