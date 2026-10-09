@@ -12,7 +12,7 @@ import {
   Alert,
 } from 'react-native';
 import styles from "./styles"
-// Reemplaza con tu token gratuito de https://finnhub.io
+
 const FINNHUB_API_KEY = process.env.EXPO_PUBLIC_API_KEY;
 
 // Activos iniciales en tu watchlist (puedes iniciar con lista vacía si prefieres)
