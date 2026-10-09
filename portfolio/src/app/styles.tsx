@@ -1,0 +1,216 @@
+import { StyleSheet } from "react-native";
+
+export default StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0F141C',
+  },
+  header: {
+    margin: 16,
+    padding: 20,
+    backgroundColor: '#171F2C',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#222F40',
+  },
+  titleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  appName: {
+    color: '#64748B',
+    fontSize: 12,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+  },
+  searchIconButton: {
+    backgroundColor: '#1E293B',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#334155',
+  },
+  searchIconText: {
+    color: '#38BDF8',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  balanceLabel: {
+    color: '#94A3B8',
+    fontSize: 14,
+  },
+  balanceValue: {
+    color: '#FFFFFF',
+    fontSize: 32,
+    fontWeight: 'bold',
+    marginTop: 4,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    color: '#E2E8F0',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  refreshButton: {
+    color: '#38BDF8',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  stockCard: {
+    backgroundColor: '#171F2C',
+    padding: 16,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#222F40',
+  },
+  tickerText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  sharesText: {
+    color: '#64748B',
+    fontSize: 13,
+    marginTop: 2,
+  },
+  valueText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  changeText: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    marginTop: 2,
+  },
+  deleteButton: {
+    padding: 8,
+    backgroundColor: '#261F25',
+    borderRadius: 8,
+  },
+  deleteButtonText: {
+    color: '#FF5252',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  emptyContainer: {
+    marginTop: 50,
+    alignItems: 'center',
+  },
+  emptyText: {
+    color: '#94A3B8',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  emptySubText: {
+    color: '#64748B',
+    fontSize: 13,
+    marginTop: 6,
+  },
+  // Estilos del Modal de Búsqueda
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#0F141C',
+    padding: 16,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1E293B',
+  },
+  modalTitle: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  closeModalText: {
+    color: '#EF4444',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    padding: 16,
+    gap: 10,
+  },
+  input: {
+    flex: 1,
+    backgroundColor: '#171F2C',
+    borderWidth: 1,
+    borderColor: '#334155',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    color: '#FFFFFF',
+    fontSize: 15,
+  },
+  fetchButton: {
+    backgroundColor: '#38BDF8',
+    borderRadius: 10,
+    justifyContent: 'center',
+    paddingHorizontal: 18,
+  },
+  fetchButtonText: {
+    color: '#0F141C',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  searchResultCard: {
+    backgroundColor: '#171F2C',
+    padding: 14,
+    marginHorizontal: 16,
+    marginBottom: 8,
+    borderRadius: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  searchTicker: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  searchDesc: {
+    color: '#64748B',
+    fontSize: 12,
+    marginTop: 2,
+  },
+  addButton: {
+    backgroundColor: '#00E676',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  addedButton: {
+    backgroundColor: '#334155',
+  },
+  addButtonText: {
+    color: '#0F141C',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  noResultsText: {
+    color: '#F59E0B',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});
