@@ -1,158 +1,118 @@
-import React, { useState, useEffect } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
-  Modal,
-  SafeAreaView,
-  Alert,
-} from 'react-native';
-import styles from "./styles"
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { Stack } from 'expo-router';
 
-const FINNHUB_API_KEY = process.env.EXPO_PUBLIC_API_KEY;
+import styles from './styles';
+import { WatchlistItem, MarketStock, SearchStockResult } from '../types/stock';
+import { fetchStockQuote } from '../services/finnhub';
+import StockDetailModal from '../components/StockDetailModal';
+import StockSearchModal from '../components/StockSearchModal';
 
-// Activos iniciales en tu watchlist (puedes iniciar con lista vacía si prefieres)
-const INITIAL_WATCHLIST = [
+const INITIAL_WATCHLIST: WatchlistItem[] = [
   { ticker: 'NVDA', name: 'Nvidia Corp.', shares: 5 },
   { ticker: 'AAPL', name: 'Apple Inc.', shares: 10 },
 ];
 
 export default function App() {
-  // Estado de la Watchlist principal
-  const [watchlist, setWatchlist] = useState(INITIAL_WATCHLIST);
-  const [marketData, setMarketData] = useState([]);
-  const [loadingWatchlist, setLoadingWatchlist] = useState(false);
-  const [totalBalance, setTotalBalance] = useState(0);
+  return (
+    <SafeAreaProvider>
+      <MainScreen />
+    </SafeAreaProvider>
+  );
+}
 
-  // Estados del Buscador / Modal
-  const [modalVisible, setModalVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [searching, setSearching] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
+function MainScreen() {
+  const [watchlist, setWatchlist] = useState<WatchlistItem[]>(INITIAL_WATCHLIST);
+  const [marketData, setMarketData] = useState<MarketStock[]>([]);
+  const [loadingWatchlist, setLoadingWatchlist] = useState<boolean>(false);
 
-  // 1. Fetch de precios para los activos en el Watchlist
-  const fetchWatchlistPrices = async (currentList = watchlist) => {
-    if (currentList.length === 0) {
+  // Modals
+  const [searchModalVisible, setSearchModalVisible] = useState(false);
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
+  const [selectedStock, setSelectedStock] = useState<MarketStock | null>(null);
+
+  const fetchWatchlistPrices = useCallback(async () => {
+    if (watchlist.length === 0) {
       setMarketData([]);
-      setTotalBalance(0);
       return;
     }
 
     setLoadingWatchlist(true);
     try {
-      const results = await Promise.all(
-        currentList.map(async (item) => {
-          const res = await fetch(
-            `https://finnhub.io/api/v1/quote?symbol=${item.ticker}&token=${FINNHUB_API_KEY}`
-          );
-          const data = await res.json();
-          const price = data.c || 0;
-          const change = data.dp || 0;
-          return {
-            ...item,
-            price,
-            change,
-            totalValue: price * item.shares,
-          };
+      const results: MarketStock[] = await Promise.all(
+        watchlist.map(async (item) => {
+          try {
+            const { price, change } = await fetchStockQuote(item.ticker);
+            return {
+              ...item,
+              price,
+              change,
+              totalValue: price * item.shares,
+            };
+          } catch {
+            return { ...item, price: 0, change: 0, totalValue: 0 };
+          }
         })
       );
-
-      const balance = results.reduce((acc, curr) => acc + curr.totalValue, 0);
       setMarketData(results);
-      setTotalBalance(balance);
     } catch (error) {
-      console.error('Error al actualizar watchlist:', error);
+      console.error(error);
+      Alert.alert('Error', 'Could not update market data.');
     } finally {
       setLoadingWatchlist(false);
     }
-  };
-
-  useEffect(() => {
-    fetchWatchlistPrices(watchlist);
   }, [watchlist]);
 
-  // 2. Fetch para buscar símbolos en Finnhub
-  const searchStocks = async () => {
-    const query = searchQuery.trim();
-    if (!query) return;
+  useEffect(() => {
+    fetchWatchlistPrices();
+  }, [fetchWatchlistPrices]);
 
-    setSearching(true);
-    setHasSearched(true);
-    try {
-      const res = await fetch(
-        `https://finnhub.io/api/v1/search?q=${encodeURIComponent(query)}&token=${FINNHUB_API_KEY}`
-      );
-      const data = await res.json();
-
-      // Filtrar símbolos comunes (acciones ordinarias / Common Stock)
-      const cleanResults = (data.result || [])
-        .filter((item) => !item.symbol.includes('.')) // Omitir clases complejas o warrants
-        .slice(0, 10);
-
-      setSearchResults(cleanResults);
-    } catch (error) {
-      console.error('Error buscando acciones:', error);
-      Alert.alert('Error', 'No se pudo conectar al servicio de búsqueda.');
-    } finally {
-      setSearching(false);
-    }
-  };
-
-  // 3. Agregar acción al Watchlist
-  const addToWatchlist = (stock) => {
-    const exists = watchlist.some((item) => item.ticker === stock.symbol);
-    if (exists) {
-      Alert.alert('Aviso', `${stock.symbol} ya está en tu lista.`);
+  const addToWatchlist = (stock: SearchStockResult) => {
+    if (watchlist.some((item) => item.ticker === stock.symbol)) {
+      Alert.alert('Notice', `${stock.symbol} is already in your watchlist.`);
       return;
     }
-
-    const newItem = {
-      ticker: stock.symbol,
-      name: stock.description || stock.symbol,
-      shares: 1, // Cantidad por defecto
-    };
-
-    const updated = [...watchlist, newItem];
-    setWatchlist(updated);
-    setModalVisible(false);
-    setSearchQuery('');
-    setSearchResults([]);
-    setHasSearched(false);
+    setWatchlist((prev) => [
+      ...prev,
+      { ticker: stock.symbol, name: stock.description || stock.symbol, shares: 1 },
+    ]);
+    setSearchModalVisible(false);
   };
 
-  // 4. Eliminar acción del Watchlist
-  const removeFromWatchlist = (ticker) => {
-    const updated = watchlist.filter((item) => item.ticker !== ticker);
-    setWatchlist(updated);
+  const removeFromWatchlist = (ticker: string) => {
+    setWatchlist((prev) => prev.filter((item) => item.ticker !== ticker));
+  };
+
+  const handleSelectStock = (stock: MarketStock) => {
+    setSelectedStock(stock);
+    setDetailModalVisible(true);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header y Tarjeta de Balance */}
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      <Stack.Screen options={{ headerShown: false, title: '' }} />
+
+      {/* Header */}
       <View style={styles.header}>
         <View style={styles.titleRow}>
-          <Text style={styles.appName}>GBM TRACK & PREDICT</Text>
+          <Text style={styles.appName}>TRACK & PREDICT</Text>
           <TouchableOpacity
             style={styles.searchIconButton}
-            onPress={() => setModalVisible(true)}
+            onPress={() => setSearchModalVisible(true)}
           >
-            <Text style={styles.searchIconText}>Buscar Acción</Text>
+            <Text style={styles.searchIconText}>Search</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Sección Watchlist Principal */}
+      {/* Watchlist Section */}
       <View style={styles.content}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Mi Watchlist ({watchlist.length})</Text>
-          <TouchableOpacity onPress={() => fetchWatchlistPrices(watchlist)} disabled={loadingWatchlist}>
+          <Text style={styles.sectionTitle}>Watchlist ({watchlist.length})</Text>
+          <TouchableOpacity onPress={fetchWatchlistPrices} disabled={loadingWatchlist}>
             <Text style={styles.refreshButton}>
-              {loadingWatchlist ? 'Actualizando...' : '↻ Refrescar'}
+              {loadingWatchlist ? 'Refreshing...' : '↻ Refresh'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -161,21 +121,25 @@ export default function App() {
           <ActivityIndicator size="large" color="#00E676" style={{ marginTop: 40 }} />
         ) : marketData.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>Tu watchlist está vacía.</Text>
-            <Text style={styles.emptySubText}>Toca "Buscar Acción" para agregar títulos.</Text>
+            <Text style={styles.emptyText}>Your watchlist is empty.</Text>
+            <Text style={styles.emptySubText}>Tap "Search" to add stocks.</Text>
           </View>
         ) : (
-          <FlatList
+          <FlatList<MarketStock>
             data={marketData}
             keyExtractor={(item) => item.ticker}
             renderItem={({ item }) => {
               const isPositive = item.change >= 0;
               return (
-                <View style={styles.stockCard}>
+                <TouchableOpacity
+                  style={styles.stockCard}
+                  activeOpacity={0.7}
+                  onPress={() => handleSelectStock(item)}
+                >
                   <View style={{ flex: 1 }}>
                     <Text style={styles.tickerText}>{item.ticker}</Text>
                     <Text style={styles.sharesText}>
-                      {item.shares} acc. • ${item.price.toFixed(2)}
+                      {item.shares} shares • ${item.price.toFixed(2)}
                     </Text>
                   </View>
 
@@ -188,87 +152,33 @@ export default function App() {
 
                   <TouchableOpacity
                     style={styles.deleteButton}
-                    onPress={() => removeFromWatchlist(item.ticker)}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      removeFromWatchlist(item.ticker);
+                    }}
                   >
                     <Text style={styles.deleteButtonText}>✕</Text>
                   </TouchableOpacity>
-                </View>
+                </TouchableOpacity>
               );
             }}
           />
         )}
       </View>
 
-      {/* MODAL DE BÚSQUEDA (FETCH) */}
-      <Modal visible={modalVisible} animationType="slide" transparent={false}>
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Buscar Acciones</Text>
-            <TouchableOpacity
-              onPress={() => {
-                setModalVisible(false);
-                setSearchQuery('');
-                setSearchResults([]);
-                setHasSearched(false);
-              }}
-            >
-              <Text style={styles.closeModalText}>Cerrar</Text>
-            </TouchableOpacity>
-          </View>
+      {/* Modals */}
+      <StockDetailModal
+        visible={detailModalVisible}
+        stock={selectedStock}
+        onClose={() => setDetailModalVisible(false)}
+      />
 
-          {/* Input de Búsqueda */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Ej. TSLA, Microsoft, VOO..."
-              placeholderTextColor="#64748B"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              autoCapitalize="characters"
-              onSubmitEditing={searchStocks}
-              returnKeyType="search"
-            />
-            <TouchableOpacity style={styles.fetchButton} onPress={searchStocks} disabled={searching}>
-              <Text style={styles.fetchButtonText}>{searching ? '...' : 'Buscar'}</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Resultados de Búsqueda */}
-          {searching ? (
-            <ActivityIndicator size="large" color="#38BDF8" style={{ marginTop: 30 }} />
-          ) : hasSearched && searchResults.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.noResultsText}>No se encontraron resultados</Text>
-              <Text style={styles.emptySubText}>Intenta buscar por el ticker exacto (ej. AMZN, MSFT).</Text>
-            </View>
-          ) : (
-            <FlatList
-              data={searchResults}
-              keyExtractor={(item) => item.symbol}
-              renderItem={({ item }) => {
-                const isAdded = watchlist.some((w) => w.ticker === item.symbol);
-                return (
-                  <View style={styles.searchResultCard}>
-                    <View style={{ flex: 1, paddingRight: 10 }}>
-                      <Text style={styles.searchTicker}>{item.symbol}</Text>
-                      <Text style={styles.searchDesc} numberOfLines={1}>
-                        {item.description}
-                      </Text>
-                    </View>
-                    <TouchableOpacity
-                      style={[styles.addButton, isAdded && styles.addedButton]}
-                      onPress={() => addToWatchlist(item)}
-                      disabled={isAdded}
-                    >
-                      <Text style={styles.addButtonText}>{isAdded ? 'Agregada' : '+ Agregar'}</Text>
-                    </TouchableOpacity>
-                  </View>
-                );
-              }}
-            />
-          )}
-        </SafeAreaView>
-      </Modal>
+      <StockSearchModal
+        visible={searchModalVisible}
+        watchlist={watchlist}
+        onClose={() => setSearchModalVisible(false)}
+        onAddStock={addToWatchlist}
+      />
     </SafeAreaView>
   );
 }
