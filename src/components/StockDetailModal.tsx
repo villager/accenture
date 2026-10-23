@@ -1,19 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Alert } from 'react-native';
+import { useEffect, useState } from 'react';
+import {
+    ActivityIndicator,
+    Alert,
+    Modal,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MarketStock, PredictionResult } from '../types/stock';
 import { fetchStockCandles } from '../services/finnhub';
 import { runNeuralForecast } from '../services/neuralForecast';
+import { modalStyles, Theme } from '../styles';
+import { ModalProps, PredictionResult } from '../types/stock';
 import StockPredictionChart from './StockPrediction';
-import styles from '../app/styles';
 
-interface Props {
-    visible: boolean;
-    stock: MarketStock | null;
-    onClose: () => void;
-}
 
-export default function StockDetailModal({ visible, stock, onClose }: Props) {
+export default function StockDetailModal({ visible, stock, onClose }: ModalProps) {
     const [loading, setLoading] = useState(false);
     const [predictionData, setPredictionData] = useState<PredictionResult | null>(null);
 
@@ -27,7 +30,6 @@ export default function StockDetailModal({ visible, stock, onClose }: Props) {
             try {
                 let prices = await fetchStockCandles(stock!.ticker);
 
-                // Fallback simulation if needed
                 if (prices.length < 5) {
                     const base = stock!.price > 0 ? stock!.price : 150;
                     prices = Array.from({ length: 25 }, (_, i) => {
@@ -41,7 +43,7 @@ export default function StockDetailModal({ visible, stock, onClose }: Props) {
                 if (isMounted) setPredictionData(prediction);
             } catch (err) {
                 console.error(err);
-                Alert.alert('Notice', 'Unable to retrieve historical data.');
+                Alert.alert('System Notice', 'Unable to retrieve historical market data.');
             } finally {
                 if (isMounted) setLoading(false);
             }
@@ -54,74 +56,106 @@ export default function StockDetailModal({ visible, stock, onClose }: Props) {
         };
     }, [visible, stock]);
 
+    const isProjectedGain = (predictionData?.projectedChangePercent ?? 0) >= 0;
+
     return (
         <Modal visible={visible} animationType="slide" transparent={false}>
-            <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
-                <View style={styles.modalHeader}>
+            <SafeAreaView style={modalStyles.container} edges={['top', 'bottom', 'left', 'right']}>
+                {/* Navigation Header */}
+                <View style={modalStyles.header}>
                     <View>
-                        <Text style={styles.modalTitle}>{stock?.ticker}</Text>
-                        <Text style={{ color: '#94A3B8', fontSize: 13 }}>{stock?.name}</Text>
+                        <Text style={modalStyles.tickerTitle}>{stock?.ticker}</Text>
+                        <Text style={modalStyles.companySubtitle} numberOfLines={1}>
+                            {stock?.name}
+                        </Text>
                     </View>
-                    <TouchableOpacity onPress={onClose}>
-                        <Text style={styles.closeModalText}>Close</Text>
+                    <TouchableOpacity
+                        style={modalStyles.closeButton}
+                        onPress={onClose}
+                        activeOpacity={0.7}
+                    >
+                        <Text style={modalStyles.closeButtonText}>Close</Text>
                     </TouchableOpacity>
                 </View>
 
                 {loading ? (
-                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        <ActivityIndicator size="large" color="#38BDF8" />
-                        <Text style={{ color: '#94A3B8', marginTop: 12 }}>Running neural network forecast...</Text>
+                    <View style={modalStyles.centerStateContainer}>
+                        <ActivityIndicator size="large" color={Theme.colors.accent} />
+                        <Text style={modalStyles.loadingText}>Running quantitative neural forecast...</Text>
                     </View>
                 ) : predictionData ? (
-                    <ScrollView contentContainerStyle={{ padding: 16 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
-                            <View>
-                                <Text style={{ color: '#64748B', fontSize: 12 }}>CURRENT PRICE</Text>
-                                <Text style={{ color: '#F8FAFC', fontSize: 26, fontWeight: '700' }}>
+                    <ScrollView
+                        contentContainerStyle={modalStyles.scrollBody}
+                        showsVerticalScrollIndicator={false}
+                    >
+                        {/* Key Metrics Grid */}
+                        <View style={modalStyles.kpiGrid}>
+                            <View style={modalStyles.kpiCard}>
+                                <Text style={modalStyles.kpiLabel}>CURRENT PRICE</Text>
+                                <Text style={modalStyles.kpiMainValue}>
                                     ${stock?.price.toFixed(2)}
                                 </Text>
+                                <Text style={modalStyles.kpiSubValue}>
+                                    Holding: ${(stock?.totalValue ?? 0).toFixed(2)}
+                                </Text>
                             </View>
-                            <View style={{ alignItems: 'flex-end' }}>
-                                <Text style={{ color: '#64748B', fontSize: 12 }}>AI 5-DAY PROJECTION</Text>
-                                <Text
-                                    style={{
-                                        fontSize: 22,
-                                        fontWeight: '700',
-                                        color: predictionData.projectedChangePercent >= 0 ? '#00E676' : '#FF5252',
-                                    }}
+
+                            <View style={modalStyles.kpiCard}>
+                                <Text style={modalStyles.kpiLabel}>5-DAY OUTLOOK</Text>
+                                <View
+                                    style={[
+                                        modalStyles.projectionBadge,
+                                        isProjectedGain ? modalStyles.badgeGain : modalStyles.badgeLoss,
+                                    ]}
                                 >
-                                    {predictionData.projectedChangePercent >= 0 ? '▲ +' : '▼ '}
-                                    {predictionData.projectedChangePercent.toFixed(2)}%
+                                    <Text
+                                        style={[
+                                            modalStyles.projectionText,
+                                            { color: isProjectedGain ? Theme.colors.gain : Theme.colors.loss },
+                                        ]}
+                                    >
+                                        {isProjectedGain ? '▲ +' : '▼ '}
+                                        {predictionData.projectedChangePercent.toFixed(2)}%
+                                    </Text>
+                                </View>
+                                <Text style={modalStyles.kpiSubValue}>
+                                    {predictionData.forecast.length > 0
+                                        ? `Target: $${predictionData.forecast[predictionData.forecast.length - 1].toFixed(2)}`
+                                        : '—'}
                                 </Text>
                             </View>
                         </View>
 
-                        <StockPredictionChart
-                            history={predictionData.history}
-                            forecast={predictionData.forecast}
-                        />
+                        {/* Chart Section */}
+                        <View style={modalStyles.chartWrapper}>
+                            <Text style={modalStyles.sectionHeaderTitle}>Neural Trajectory Curve</Text>
+                            <StockPredictionChart
+                                history={predictionData.history}
+                                forecast={predictionData.forecast}
+                            />
+                        </View>
 
-                        <View
-                            style={{
-                                backgroundColor: '#1E293B',
-                                borderRadius: 12,
-                                padding: 16,
-                                marginTop: 24,
-                                borderWidth: 1,
-                                borderColor: '#334155',
-                            }}
-                        >
-                            <Text style={{ color: '#38BDF8', fontWeight: '700', fontSize: 14, marginBottom: 6 }}>
-                                Neural Network Analysis
-                            </Text>
-                            <Text style={{ color: '#94A3B8', fontSize: 13, lineHeight: 19 }}>
-                                The solid line represents historical daily closes. The dotted line represents the forward 5-day regression curve computed via nonlinear neural momentum.
+                        {/* Methodology Note */}
+                        <View style={modalStyles.disclaimerCard}>
+                            <View style={modalStyles.disclaimerHeaderRow}>
+                                <View style={modalStyles.bulletIndicator} />
+                                <Text style={modalStyles.disclaimerTitle}>
+                                    Inference Methodology
+                                </Text>
+                            </View>
+                            <Text style={modalStyles.disclaimerContent}>
+                                The solid line represents recent historical market close data. The dashed
+                                line models a 5-session forward regression computed via nonlinear momentum
+                                with exponentially weighted moving average (EWMA) volatility adjustment.
                             </Text>
                         </View>
                     </ScrollView>
                 ) : (
-                    <View style={styles.emptyContainer}>
-                        <Text style={styles.noResultsText}>No historical records available</Text>
+                    <View style={modalStyles.centerStateContainer}>
+                        <Text style={modalStyles.noDataTitle}>No Data Available</Text>
+                        <Text style={modalStyles.noDataSubtitle}>
+                            Insufficient historical trading data to compute projections for this asset.
+                        </Text>
                     </View>
                 )}
             </SafeAreaView>

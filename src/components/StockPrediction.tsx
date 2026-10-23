@@ -1,16 +1,18 @@
 import { useMemo } from 'react';
-import { View, Text, Dimensions } from 'react-native';
-import Svg, { Path, Circle, Line as SvgLine, Text as SvgText } from 'react-native-svg';
+import { Dimensions, Text, View } from 'react-native';
+import Svg, { Circle, Path, Line as SvgLine, Text as SvgText } from 'react-native-svg';
+import { Theme } from '../styles/theme';
 
 interface Props {
-    history: number[];
-    forecast: number[];
+    history: readonly number[];
+    forecast: readonly number[];
 }
 
 export default function StockPredictionChart({ history, forecast }: Props) {
     const chartWidth = Dimensions.get('window').width - 32;
-    const chartHeight = 220;
-    const padding = 20;
+    const chartHeight = 200;
+    const paddingVertical = 24;
+    const paddingHorizontal = 16;
 
     const { histPoints, predPoints, minP, maxP } = useMemo(() => {
         const combined = [...history, ...forecast];
@@ -19,22 +21,21 @@ export default function StockPredictionChart({ history, forecast }: Props) {
         const range = maxP - minP === 0 ? 1 : maxP - minP;
 
         const totalCount = history.length + forecast.length - 1;
-        const stepX = (chartWidth - padding * 2) / totalCount;
+        const stepX = (chartWidth - paddingHorizontal * 2) / Math.max(1, totalCount);
 
-        const histPoints = history.map((val, idx) => {
-            const x = padding + idx * stepX;
-            const y = chartHeight - padding - ((val - minP) / range) * (chartHeight - padding * 2);
-            return { x, y };
-        });
+        const histPoints = history.map((val, idx) => ({
+            x: paddingHorizontal + idx * stepX,
+            y: chartHeight - paddingVertical - ((val - minP) / range) * (chartHeight - paddingVertical * 2),
+        }));
 
-        const lastHistPoint = histPoints[histPoints.length - 1];
+        const lastHist = histPoints[histPoints.length - 1] || { x: paddingHorizontal, y: chartHeight / 2 };
+
         const predPoints = [
-            lastHistPoint,
-            ...forecast.map((val, idx) => {
-                const x = padding + (history.length + idx) * stepX;
-                const y = chartHeight - padding - ((val - minP) / range) * (chartHeight - padding * 2);
-                return { x, y };
-            }),
+            lastHist,
+            ...forecast.map((val, idx) => ({
+                x: paddingHorizontal + (history.length + idx) * stepX,
+                y: chartHeight - paddingVertical - ((val - minP) / range) * (chartHeight - paddingVertical * 2),
+            })),
         ];
 
         return { histPoints, predPoints, minP, maxP };
@@ -56,78 +57,73 @@ export default function StockPredictionChart({ history, forecast }: Props) {
         );
     }, [predPoints]);
 
-    const isPredictUp = (forecast[forecast.length - 1] || 0) >= (history[history.length - 1] || 0);
+    const isPredictUp = (forecast[forecast.length - 1] ?? 0) >= (history[history.length - 1] ?? 0);
+    const trendColor = isPredictUp ? Theme.colors.gain : Theme.colors.loss;
 
     return (
         <View
             style={{
-                backgroundColor: '#0F172A',
-                borderRadius: 16,
-                paddingVertical: 12,
-                alignItems: 'center',
+                backgroundColor: Theme.colors.surface,
+                borderRadius: Theme.radius.lg,
+                paddingVertical: 16,
                 borderWidth: 1,
-                borderColor: '#1E293B',
+                borderColor: Theme.colors.border,
             }}
         >
             <Svg width={chartWidth} height={chartHeight}>
                 <SvgLine
-                    x1={padding}
-                    y1={padding}
-                    x2={chartWidth - padding}
-                    y2={padding}
-                    stroke="#334155"
-                    strokeDasharray="4 4"
+                    x1={paddingHorizontal}
+                    y1={paddingVertical}
+                    x2={chartWidth - paddingHorizontal}
+                    y2={paddingVertical}
+                    stroke={Theme.colors.border}
+                    strokeDasharray="3 3"
                 />
-                <SvgText x={padding} y={padding - 4} fill="#64748B" fontSize="10">
-                    ${maxP.toFixed(2)}
+                <SvgText x={paddingHorizontal} y={paddingVertical - 6} fill={Theme.colors.textMuted} fontSize="10" fontWeight="600">
+                    HIGH ${maxP.toFixed(2)}
                 </SvgText>
 
                 <SvgLine
-                    x1={padding}
-                    y1={chartHeight - padding}
-                    x2={chartWidth - padding}
-                    y2={chartHeight - padding}
-                    stroke="#334155"
-                    strokeDasharray="4 4"
+                    x1={paddingHorizontal}
+                    y1={chartHeight - paddingVertical}
+                    x2={chartWidth - paddingHorizontal}
+                    y2={chartHeight - paddingVertical}
+                    stroke={Theme.colors.border}
+                    strokeDasharray="3 3"
                 />
-                <SvgText x={padding} y={chartHeight - 4} fill="#64748B" fontSize="10">
-                    ${minP.toFixed(2)}
+                <SvgText x={paddingHorizontal} y={chartHeight - 6} fill={Theme.colors.textMuted} fontSize="10" fontWeight="600">
+                    LOW ${minP.toFixed(2)}
                 </SvgText>
 
-                <Path d={historyPath} fill="none" stroke="#38BDF8" strokeWidth={2.5} />
+                <Path d={historyPath} fill="none" stroke={Theme.colors.accent} strokeWidth={2.2} strokeLinecap="round" />
+
                 <Path
                     d={forecastPath}
                     fill="none"
-                    stroke={isPredictUp ? '#00E676' : '#FF5252'}
-                    strokeWidth={2.5}
-                    strokeDasharray="5 4"
+                    stroke={trendColor}
+                    strokeWidth={2.2}
+                    strokeDasharray="4 3"
+                    strokeLinecap="round"
                 />
 
                 {predPoints.length > 0 && (
                     <Circle
                         cx={predPoints[predPoints.length - 1].x}
                         cy={predPoints[predPoints.length - 1].y}
-                        r={4}
-                        fill={isPredictUp ? '#00E676' : '#FF5252'}
+                        r={4.5}
+                        fill={trendColor}
                     />
                 )}
             </Svg>
 
-            <View style={{ flexDirection: 'row', gap: 16, marginTop: 8 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 20, marginTop: 12 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <View style={{ width: 14, height: 3, backgroundColor: '#38BDF8', borderRadius: 2 }} />
-                    <Text style={{ color: '#94A3B8', fontSize: 11 }}>Historical</Text>
+                    <View style={{ width: 12, height: 3, backgroundColor: Theme.colors.accent, borderRadius: 2 }} />
+                    <Text style={{ color: Theme.colors.textSecondary, fontSize: 11, fontWeight: '500' }}>Historical Close</Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <View
-                        style={{
-                            width: 14,
-                            height: 3,
-                            backgroundColor: isPredictUp ? '#00E676' : '#FF5252',
-                            borderRadius: 2,
-                        }}
-                    />
-                    <Text style={{ color: '#94A3B8', fontSize: 11 }}>Predicted (5D)</Text>
+                    <View style={{ width: 12, height: 3, backgroundColor: trendColor, borderRadius: 2 }} />
+                    <Text style={{ color: Theme.colors.textSecondary, fontSize: 11, fontWeight: '500' }}>AI Forecast (5D)</Text>
                 </View>
             </View>
         </View>

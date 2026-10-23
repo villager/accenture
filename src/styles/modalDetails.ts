@@ -1,0 +1,160 @@
+import { StyleSheet } from "react-native";
+import { Theme } from "./theme";
+export const modalStyles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: Theme.colors.background,
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingVertical: 14,
+        borderBottomWidth: 1,
+        borderBottomColor: Theme.colors.border,
+        backgroundColor: Theme.colors.surface,
+    },
+    tickerTitle: {
+        color: Theme.colors.textPrimary,
+        fontSize: 20,
+        fontWeight: '800',
+        letterSpacing: 0.5,
+    },
+    companySubtitle: {
+        color: Theme.colors.textSecondary,
+        fontSize: 13,
+        marginTop: 2,
+        maxWidth: 220,
+    },
+    closeButton: {
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        backgroundColor: Theme.colors.surfaceSubtle,
+        borderRadius: Theme.radius.sm,
+        borderWidth: 1,
+        borderColor: Theme.colors.border,
+    },
+    closeButtonText: {
+        color: Theme.colors.accent,
+        fontSize: 13,
+        fontWeight: '600',
+    },
+    scrollBody: {
+        padding: 16,
+    },
+    kpiGrid: {
+        flexDirection: 'row',
+        gap: 12,
+        marginBottom: 20,
+    },
+    kpiCard: {
+        flex: 1,
+        backgroundColor: Theme.colors.surface,
+        padding: 14,
+        borderRadius: Theme.radius.md,
+        borderWidth: 1,
+        borderColor: Theme.colors.border,
+        justifyContent: 'space-between',
+    },
+    kpiLabel: {
+        color: Theme.colors.textMuted,
+        fontSize: 11,
+        fontWeight: '700',
+        letterSpacing: 0.8,
+    },
+    kpiMainValue: {
+        color: Theme.colors.textPrimary,
+        fontSize: 22,
+        fontWeight: '800',
+        marginTop: 6,
+        fontVariant: ['tabular-nums'],
+    },
+    kpiSubValue: {
+        color: Theme.colors.textSecondary,
+        fontSize: 12,
+        marginTop: 4,
+        fontVariant: ['tabular-nums'],
+    },
+    projectionBadge: {
+        alignSelf: 'flex-start',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: Theme.radius.sm,
+        marginTop: 6,
+    },
+    badgeGain: {
+        backgroundColor: Theme.colors.gainSoft,
+    },
+    badgeLoss: {
+        backgroundColor: Theme.colors.lossSoft,
+    },
+    projectionText: {
+        fontSize: 15,
+        fontWeight: '700',
+        fontVariant: ['tabular-nums'],
+    },
+    chartWrapper: {
+        marginBottom: 20,
+    },
+    sectionHeaderTitle: {
+        color: Theme.colors.textPrimary,
+        fontSize: 14,
+        fontWeight: '700',
+        marginBottom: 10,
+        letterSpacing: 0.3,
+    },
+    disclaimerCard: {
+        backgroundColor: Theme.colors.surface,
+        borderRadius: Theme.radius.md,
+        padding: 16,
+        borderWidth: 1,
+        borderColor: Theme.colors.border,
+    },
+    disclaimerHeaderRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginBottom: 8,
+    },
+    bulletIndicator: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: Theme.colors.accent,
+    },
+    disclaimerTitle: {
+        color: Theme.colors.accent,
+        fontWeight: '700',
+        fontSize: 13,
+        letterSpacing: 0.3,
+    },
+    disclaimerContent: {
+        color: Theme.colors.textSecondary,
+        fontSize: 12,
+        lineHeight: 18,
+    },
+    centerStateContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 24,
+    },
+    loadingText: {
+        color: Theme.colors.textSecondary,
+        marginTop: 14,
+        fontSize: 13,
+    },
+    noDataTitle: {
+        color: Theme.colors.textPrimary,
+        fontSize: 16,
+        fontWeight: '700',
+    },
+    noDataSubtitle: {
+        color: Theme.colors.textSecondary,
+        fontSize: 13,
+        textAlign: 'center',
+        marginTop: 6,
+        lineHeight: 18,
+    },
+});

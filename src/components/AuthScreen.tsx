@@ -11,11 +11,11 @@ import {
     View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { supabase } from '../services/supabase';
+import { supabase } from '../services';
 
 type AuthMode = 'signin' | 'signup' | 'forgot';
 
-export default function AuthScreen() {
+export function AuthScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -234,3 +234,5 @@ const localStyles = StyleSheet.create({
         fontSize: 13,
     },
 });
+
+export default AuthScreen;

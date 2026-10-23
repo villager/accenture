@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Modal, View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { SearchStockResult, WatchlistItem } from '../types/stock';
 import { searchStocksApi } from '../services/finnhub';
-import styles from '../app/styles';
+import { Theme } from '../styles/theme';
+import { SearchStockResult, WatchlistItem } from '../types/stock';
 
 interface Props {
     visible: boolean;
@@ -122,3 +122,100 @@ export default function StockSearchModal({ visible, watchlist, onClose, onAddSto
         </Modal>
     );
 }
+
+const styles = StyleSheet.create({
+    modalContainer: {
+        flex: 1,
+        backgroundColor: Theme.colors.background,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingVertical: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: Theme.colors.border,
+    },
+    modalTitle: {
+        color: Theme.colors.textPrimary,
+        fontSize: 18,
+        fontWeight: '700',
+    },
+    closeModalText: {
+        color: Theme.colors.accent,
+        fontSize: 14,
+        fontWeight: '600',
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 16,
+        gap: 10,
+    },
+    input: {
+        flex: 1,
+        backgroundColor: Theme.colors.surface,
+        borderWidth: 1,
+        borderColor: Theme.colors.border,
+        borderRadius: Theme.radius.md,
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        color: Theme.colors.textPrimary,
+        fontSize: 15,
+    },
+    emptyContainer: {
+        marginTop: 60,
+        alignItems: 'center',
+        paddingHorizontal: 24,
+    },
+    noResultsText: {
+        color: Theme.colors.textSecondary,
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    emptySubText: {
+        color: Theme.colors.textMuted,
+        fontSize: 13,
+        marginTop: 6,
+        textAlign: 'center',
+    },
+    searchResultCard: {
+        backgroundColor: Theme.colors.surface,
+        padding: 14,
+        marginHorizontal: 16,
+        marginBottom: 8,
+        borderRadius: Theme.radius.md,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: Theme.colors.border,
+    },
+    searchTicker: {
+        color: Theme.colors.textPrimary,
+        fontSize: 16,
+        fontWeight: '700',
+    },
+    searchDesc: {
+        color: Theme.colors.textSecondary,
+        fontSize: 12,
+        marginTop: 2,
+    },
+    addButton: {
+        backgroundColor: Theme.colors.accent,
+        paddingVertical: 8,
+        paddingHorizontal: 14,
+        borderRadius: Theme.radius.sm,
+    },
+    addedButton: {
+        backgroundColor: Theme.colors.surfaceSubtle,
+        borderWidth: 1,
+        borderColor: Theme.colors.border,
+    },
+    addButtonText: {
+        color: Theme.colors.background,
+        fontWeight: '700',
+        fontSize: 12,
+    },
+});
