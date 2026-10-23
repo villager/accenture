@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
-import { Theme } from './theme';
+import { StyleSheet } from "react-native";
+import { Theme } from "./theme";
 
 export default StyleSheet.create({
   container: {
@@ -19,19 +19,19 @@ export default StyleSheet.create({
     borderColor: Theme.colors.border,
   },
   headerTopRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   brandBadge: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: "700",
     letterSpacing: 1.5,
     color: Theme.colors.textMuted,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
   },
   headerActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
   btnPrimaryCompact: {
@@ -45,10 +45,10 @@ export default StyleSheet.create({
   btnPrimaryText: {
     color: Theme.colors.accent,
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   btnSecondaryCompact: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     paddingVertical: 7,
     paddingHorizontal: 14,
     borderRadius: Theme.radius.sm,
@@ -58,7 +58,7 @@ export default StyleSheet.create({
   btnSecondaryText: {
     color: Theme.colors.textSecondary,
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 
   // Resumen del portafolio dentro del Header
@@ -67,22 +67,22 @@ export default StyleSheet.create({
     paddingTop: 16,
     borderTopWidth: 1,
     borderTopColor: Theme.colors.border,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
   },
   portfolioLabel: {
     fontSize: 12,
     color: Theme.colors.textSecondary,
-    fontWeight: '500',
+    fontWeight: "500",
     letterSpacing: 0.5,
   },
   portfolioTotalValue: {
     fontSize: 26,
-    fontWeight: '800',
+    fontWeight: "800",
     color: Theme.colors.textPrimary,
     marginTop: 2,
-    fontVariant: ['tabular-nums'],
+    fontVariant: ["tabular-nums"],
   },
 
   // Contenido y Watchlist
@@ -91,21 +91,21 @@ export default StyleSheet.create({
     paddingHorizontal: 16,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 12,
   },
   sectionTitle: {
     color: Theme.colors.textPrimary,
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: "700",
     letterSpacing: 0.3,
   },
   refreshText: {
     color: Theme.colors.accent,
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 
   // Tarjeta de cada Acción
@@ -113,9 +113,9 @@ export default StyleSheet.create({
     backgroundColor: Theme.colors.surface,
     padding: 16,
     borderRadius: Theme.radius.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 8,
     borderWidth: 1,
     borderColor: Theme.colors.border,
@@ -126,8 +126,8 @@ export default StyleSheet.create({
   tickerText: {
     color: Theme.colors.textPrimary,
     fontSize: 16,
-    fontWeight: '700',
-    fontVariant: ['tabular-nums'],
+    fontWeight: "700",
+    fontVariant: ["tabular-nums"],
   },
   stockSubText: {
     color: Theme.colors.textSecondary,
@@ -135,14 +135,14 @@ export default StyleSheet.create({
     marginTop: 3,
   },
   stockRightCol: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
     marginRight: 14,
   },
   stockPriceValue: {
     color: Theme.colors.textPrimary,
     fontSize: 16,
-    fontWeight: '700',
-    fontVariant: ['tabular-nums'],
+    fontWeight: "700",
+    fontVariant: ["tabular-nums"],
   },
   badgePill: {
     paddingHorizontal: 8,
@@ -159,14 +159,14 @@ export default StyleSheet.create({
   badgeTextGain: {
     color: Theme.colors.gain,
     fontSize: 12,
-    fontWeight: '700',
-    fontVariant: ['tabular-nums'],
+    fontWeight: "700",
+    fontVariant: ["tabular-nums"],
   },
   badgeTextLoss: {
     color: Theme.colors.loss,
     fontSize: 12,
-    fontWeight: '700',
-    fontVariant: ['tabular-nums'],
+    fontWeight: "700",
+    fontVariant: ["tabular-nums"],
   },
   deleteActionBtn: {
     padding: 8,
@@ -176,7 +176,7 @@ export default StyleSheet.create({
   deleteActionText: {
     color: Theme.colors.textMuted,
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 
   // Modales
@@ -185,9 +185,9 @@ export default StyleSheet.create({
     backgroundColor: Theme.colors.background,
   },
   modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
@@ -196,17 +196,17 @@ export default StyleSheet.create({
   modalTitle: {
     color: Theme.colors.textPrimary,
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   modalCloseText: {
     color: Theme.colors.accent,
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   inputWrap: {
     padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   searchInput: {
@@ -224,18 +224,18 @@ export default StyleSheet.create({
   // Empty state
   emptyContainer: {
     marginTop: 60,
-    alignItems: 'center',
+    alignItems: "center",
     paddingHorizontal: 24,
   },
   emptyTitle: {
     color: Theme.colors.textPrimary,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   emptySubtitle: {
     color: Theme.colors.textSecondary,
     fontSize: 13,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 6,
     lineHeight: 18,
   },
